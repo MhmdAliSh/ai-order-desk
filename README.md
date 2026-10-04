@@ -39,7 +39,6 @@ Small retailers often manage product requests, stock, and customer conversations
 6. Open **Operations** to review alerts, sales signals, and owner-approved restock items.
 7. Open **CSV import** and preview `sample-data/product-import-template.csv` before confirming an update.
 
-A ready-to-record script is available in [portfolio-demo-script.md](docs/portfolio-demo-script.md).
 
 ## Architecture
 
@@ -109,7 +108,6 @@ npm run dev
 
 Open `http://127.0.0.1:5173`, choose **Team workspace**, and create the first owner account. The backend API documentation is available at `http://127.0.0.1:8000/docs`.
 
-For detailed commands, see [backend setup](docs/backend-setup.md) and [frontend setup](docs/frontend-setup.md).
 
 ## Verification
 
@@ -131,4 +129,6 @@ All sample data is fictional. The app uses AI only to interpret customer message
 - Supplier purchase-order drafts
 - Password reset and more detailed staff roles
 - 30-day/custom sales reports and charts
-- GitHub Actions checks after the repository is published
+- GitHub Actions checks for automated verification
+
+
