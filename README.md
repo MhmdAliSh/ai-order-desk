@@ -21,8 +21,8 @@ Small retailers often manage product requests, stock, and customer conversations
 - Searchable catalog with 50 fictional phone-shop products
 - Manual order workflow: **draft → approved → dispatched / cancelled**
 - Deterministic totals and stock validation using integer cents
-- AI-assisted message intake with editable product matches and quantities
-- Team message inbox that sends requests to AI review
+- Automatic social-message analysis with editable product matches and quantities inside the team inbox
+- Staff send reviewed message suggestions directly into a prefilled New Order draft
 - Daily operations report, restock suggestions, alerts, and sales signals
 - Owner-reviewed ready-to-order queue
 - Supplier directory for manual restock follow-up
@@ -31,12 +31,13 @@ Small retailers often manage product requests, stock, and customer conversations
 
 ## Demo flow
 
-1. Open **Messages** and select a fictional customer request.
-2. Choose **Review with AI** and correct any suggested products or quantities.
-3. Save an order draft, approve it, then dispatch it.
-4. Open **Stock history** to see the logged stock deduction.
-5. Open **Operations** to review alerts, sales signals, and owner-approved restock items.
-6. Open **CSV import** and preview `sample-data/product-import-template.csv` before confirming an update.
+1. A customer message arrives through a connected social channel and is analyzed automatically.
+2. Open **Messages**, review the AI suggestion, and edit any product or quantity.
+3. Send the reviewed suggestion to **New Order**, select the customer, and save the draft.
+4. Confirm the order to reserve stock, then confirm dispatch to deduct it.
+5. Open **Stock history** to see the logged stock deduction.
+6. Open **Operations** to review alerts, sales signals, and owner-approved restock items.
+7. Open **CSV import** and preview `sample-data/product-import-template.csv` before confirming an update.
 
 A ready-to-record script is available in [portfolio-demo-script.md](docs/portfolio-demo-script.md).
 
@@ -44,14 +45,18 @@ A ready-to-record script is available in [portfolio-demo-script.md](docs/portfol
 
 ```mermaid
 graph LR
-  M[Customer message] --> I[AI intake]
-  I --> R[Staff review]
-  R --> O[Order draft]
-  O --> A[Approve: reserve stock]
-  A --> D[Dispatch: deduct stock]
-  D --> H[Stock history and operations]
-  C[CSV catalog import] --> P[Preview and confirm]
-  P --> H
+  S[Social / WhatsApp message] --> W[Inbound webhook]
+  W --> AI[Automatic AI analysis]
+  AI --> M[Messages inbox: staff review and edit]
+  M --> O[New Order draft]
+  O --> A[Confirm order: reserve stock]
+  A --> D[Confirm dispatch: deduct stock]
+  D --> H[Stock history, alerts, and operations]
+  C[CSV catalog import] --> P[Preview and owner confirmation]
+  P --> K[Catalog and import history]
+  K --> AI
+  Q[Supplier directory] --> R[Ready-to-order queue]
+  H --> R
 ```
 
 ## Screenshots and video
