@@ -1,0 +1,352 @@
+[
+  {
+    "sku": "DEMO-CHG-001",
+    "name": "USB-C wall charger 20W - White",
+    "category": "Chargers",
+    "price": "9.50",
+    "stock": 40
+  },
+  {
+    "sku": "DEMO-CHG-002",
+    "name": "USB-C wall charger 25W - Black",
+    "category": "Chargers",
+    "price": "12.99",
+    "stock": 30
+  },
+  {
+    "sku": "DEMO-CHG-003",
+    "name": "USB-C wall charger 30W - White",
+    "category": "Chargers",
+    "price": "14.50",
+    "stock": 18
+  },
+  {
+    "sku": "DEMO-CHG-004",
+    "name": "Dual USB-C wall charger 40W - Black",
+    "category": "Chargers",
+    "price": "19.00",
+    "stock": 12
+  },
+  {
+    "sku": "DEMO-CHG-005",
+    "name": "GaN USB-C charger 65W - Black",
+    "category": "Chargers",
+    "price": "29.99",
+    "stock": 8
+  },
+  {
+    "sku": "DEMO-CHG-006",
+    "name": "GaN USB-C charger 100W - Gray",
+    "category": "Chargers",
+    "price": "44.00",
+    "stock": 4
+  },
+  {
+    "sku": "DEMO-CHG-007",
+    "name": "USB-A wall charger 12W - White",
+    "category": "Chargers",
+    "price": "6.50",
+    "stock": 60
+  },
+  {
+    "sku": "DEMO-CHG-008",
+    "name": "Dual USB-A wall charger 24W - Black",
+    "category": "Chargers",
+    "price": "8.75",
+    "stock": 25
+  },
+  {
+    "sku": "DEMO-CHG-009",
+    "name": "USB-C car charger 30W - Black",
+    "category": "Chargers",
+    "price": "11.00",
+    "stock": 20
+  },
+  {
+    "sku": "DEMO-CHG-010",
+    "name": "Dual-port car charger 45W - Gray",
+    "category": "Chargers",
+    "price": "16.50",
+    "stock": 7
+  },
+  {
+    "sku": "DEMO-CHG-011",
+    "name": "Wireless charging pad 15W - Black",
+    "category": "Chargers",
+    "price": "13.99",
+    "stock": 0
+  },
+  {
+    "sku": "DEMO-CHG-012",
+    "name": "Wireless charging stand 15W - White",
+    "category": "Chargers",
+    "price": "18.50",
+    "stock": 3
+  },
+  {
+    "sku": "DEMO-CBL-001",
+    "name": "USB-A to USB-C cable 1m - Black",
+    "category": "Cables",
+    "price": "3.50",
+    "stock": 100
+  },
+  {
+    "sku": "DEMO-CBL-002",
+    "name": "USB-A to USB-C cable 2m - Black",
+    "category": "Cables",
+    "price": "4.50",
+    "stock": 60
+  },
+  {
+    "sku": "DEMO-CBL-003",
+    "name": "USB-A to USB-C cable 1m - White",
+    "category": "Cables",
+    "price": "3.50",
+    "stock": 75
+  },
+  {
+    "sku": "DEMO-CBL-004",
+    "name": "USB-C to USB-C cable 60W 1m - Black",
+    "category": "Cables",
+    "price": "5.00",
+    "stock": 80
+  },
+  {
+    "sku": "DEMO-CBL-005",
+    "name": "USB-C to USB-C cable 60W 2m - Black",
+    "category": "Cables",
+    "price": "6.50",
+    "stock": 45
+  },
+  {
+    "sku": "DEMO-CBL-006",
+    "name": "USB-C to USB-C cable 60W 1m - White",
+    "category": "Cables",
+    "price": "5.00",
+    "stock": 35
+  },
+  {
+    "sku": "DEMO-CBL-007",
+    "name": "USB-C to USB-C braided cable 100W 1m - Gray",
+    "category": "Cables",
+    "price": "8.00",
+    "stock": 22
+  },
+  {
+    "sku": "DEMO-CBL-008",
+    "name": "USB-C to USB-C braided cable 100W 2m - Gray",
+    "category": "Cables",
+    "price": "10.00",
+    "stock": 9
+  },
+  {
+    "sku": "DEMO-CBL-009",
+    "name": "USB-A to Lightning cable 1m - White",
+    "category": "Cables",
+    "price": "6.00",
+    "stock": 50
+  },
+  {
+    "sku": "DEMO-CBL-010",
+    "name": "USB-A to Lightning cable 2m - White",
+    "category": "Cables",
+    "price": "7.50",
+    "stock": 15
+  },
+  {
+    "sku": "DEMO-CBL-011",
+    "name": "USB-C to Lightning cable 1m - White",
+    "category": "Cables",
+    "price": "8.50",
+    "stock": 5
+  },
+  {
+    "sku": "DEMO-CBL-012",
+    "name": "USB-C to Lightning cable 2m - Black",
+    "category": "Cables",
+    "price": "10.50",
+    "stock": 0
+  },
+  {
+    "sku": "DEMO-CBL-013",
+    "name": "USB-A to Micro-USB cable 1m - Black",
+    "category": "Cables",
+    "price": "2.50",
+    "stock": 30
+  },
+  {
+    "sku": "DEMO-CBL-014",
+    "name": "USB-A to Micro-USB cable 2m - Black",
+    "category": "Cables",
+    "price": "3.50",
+    "stock": 6
+  },
+  {
+    "sku": "DEMO-CAS-001",
+    "name": "Case for iPhone 15 - Silicone Black",
+    "category": "Cases",
+    "price": "5.50",
+    "stock": 35
+  },
+  {
+    "sku": "DEMO-CAS-002",
+    "name": "Case for iPhone 15 - Silicone Blue",
+    "category": "Cases",
+    "price": "5.50",
+    "stock": 18
+  },
+  {
+    "sku": "DEMO-CAS-003",
+    "name": "Case for iPhone 15 - Clear",
+    "category": "Cases",
+    "price": "4.50",
+    "stock": 25
+  },
+  {
+    "sku": "DEMO-CAS-004",
+    "name": "Case for iPhone 15 Pro - Silicone Black",
+    "category": "Cases",
+    "price": "6.50",
+    "stock": 14
+  },
+  {
+    "sku": "DEMO-CAS-005",
+    "name": "Case for iPhone 15 Pro - Clear",
+    "category": "Cases",
+    "price": "5.50",
+    "stock": 9
+  },
+  {
+    "sku": "DEMO-CAS-006",
+    "name": "Case for iPhone 16 - Silicone Black",
+    "category": "Cases",
+    "price": "6.00",
+    "stock": 30
+  },
+  {
+    "sku": "DEMO-CAS-007",
+    "name": "Case for iPhone 16 - Clear",
+    "category": "Cases",
+    "price": "5.00",
+    "stock": 21
+  },
+  {
+    "sku": "DEMO-CAS-008",
+    "name": "Case for iPhone 16 Pro - Rugged Black",
+    "category": "Cases",
+    "price": "9.50",
+    "stock": 5
+  },
+  {
+    "sku": "DEMO-CAS-009",
+    "name": "Case for Samsung Galaxy A55 - Silicone Black",
+    "category": "Cases",
+    "price": "4.00",
+    "stock": 40
+  },
+  {
+    "sku": "DEMO-CAS-010",
+    "name": "Case for Samsung Galaxy A55 - Clear",
+    "category": "Cases",
+    "price": "3.50",
+    "stock": 20
+  },
+  {
+    "sku": "DEMO-CAS-011",
+    "name": "Case for Samsung Galaxy S24 - Silicone Black",
+    "category": "Cases",
+    "price": "5.50",
+    "stock": 12
+  },
+  {
+    "sku": "DEMO-CAS-012",
+    "name": "Case for Samsung Galaxy S24 - Clear",
+    "category": "Cases",
+    "price": "4.50",
+    "stock": 4
+  },
+  {
+    "sku": "DEMO-CAS-013",
+    "name": "Case for Samsung Galaxy S25 - Rugged Black",
+    "category": "Cases",
+    "price": "8.00",
+    "stock": 0
+  },
+  {
+    "sku": "DEMO-CAS-014",
+    "name": "Case for Samsung Galaxy A35 - Silicone Blue",
+    "category": "Cases",
+    "price": "4.00",
+    "stock": 16
+  },
+  {
+    "sku": "DEMO-AUD-001",
+    "name": "Wired USB-C earphones - White",
+    "category": "Headphones",
+    "price": "7.50",
+    "stock": 45
+  },
+  {
+    "sku": "DEMO-AUD-002",
+    "name": "Wired USB-C earphones - Black",
+    "category": "Headphones",
+    "price": "7.50",
+    "stock": 28
+  },
+  {
+    "sku": "DEMO-AUD-003",
+    "name": "Wired 3.5mm earphones - Black",
+    "category": "Headphones",
+    "price": "4.50",
+    "stock": 65
+  },
+  {
+    "sku": "DEMO-AUD-004",
+    "name": "Wired 3.5mm earphones - White",
+    "category": "Headphones",
+    "price": "4.50",
+    "stock": 32
+  },
+  {
+    "sku": "DEMO-AUD-005",
+    "name": "Wireless earbuds Basic - Black",
+    "category": "Headphones",
+    "price": "18.00",
+    "stock": 24
+  },
+  {
+    "sku": "DEMO-AUD-006",
+    "name": "Wireless earbuds Basic - White",
+    "category": "Headphones",
+    "price": "18.00",
+    "stock": 17
+  },
+  {
+    "sku": "DEMO-AUD-007",
+    "name": "Wireless earbuds ANC - Black",
+    "category": "Headphones",
+    "price": "35.00",
+    "stock": 6
+  },
+  {
+    "sku": "DEMO-AUD-008",
+    "name": "Wireless on-ear headphones - Blue",
+    "category": "Headphones",
+    "price": "22.50",
+    "stock": 10
+  },
+  {
+    "sku": "DEMO-AUD-009",
+    "name": "Wireless over-ear headphones - Black",
+    "category": "Headphones",
+    "price": "29.00",
+    "stock": 3
+  },
+  {
+    "sku": "DEMO-AUD-010",
+    "name": "Wired gaming headset 3.5mm - Black",
+    "category": "Headphones",
+    "price": "24.99",
+    "stock": 0
+  }
+]

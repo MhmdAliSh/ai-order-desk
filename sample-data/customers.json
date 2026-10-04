@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Cedar Mobile",
+    "contact_name": "Rami Haddad",
+    "phone": "+961 3 456 201",
+    "email": "rami@cedarmobile.example"
+  },
+  {
+    "name": "Beirut Tech Point",
+    "contact_name": "Maya Khoury",
+    "phone": "+961 76 918 402",
+    "email": "maya@beiruttech.example"
+  },
+  {
+    "name": "Phone Corner",
+    "contact_name": "Omar Saad",
+    "phone": "+961 71 302 194",
+    "email": "omar@phonecorner.example"
+  },
+  {
+    "name": "City Accessories",
+    "contact_name": "Layla Nasser",
+    "phone": "+961 70 815 633",
+    "email": "layla@cityaccessories.example"
+  },
+  {
+    "name": "Northline Mobile",
+    "contact_name": "Karim Fares",
+    "phone": "+961 3 704 580",
+    "email": "karim@northline.example"
+  },
+  {
+    "name": "Connect Hub",
+    "contact_name": "Nour Aboujaoude",
+    "phone": "+961 76 443 792",
+    "email": "nour@connecthub.example"
+  },
+  {
+    "name": "Metro Gadgets",
+    "contact_name": "Tarek Younes",
+    "phone": "+961 81 595 321",
+    "email": "tarek@metrogadgets.example"
+  },
+  {
+    "name": "Cedar Avenue Electronics",
+    "contact_name": "Jad Salameh",
+    "phone": "+961 71 284 910",
+    "email": "jad@cedaravenue.example"
+  },
+  {
+    "name": "Smart Link Store",
+    "contact_name": "Sara Matar",
+    "phone": "+961 70 663 108",
+    "email": "sara@smartlink.example"
+  },
+  {
+    "name": "Westside Telecom",
+    "contact_name": "Fadi Rizk",
+    "phone": "+961 3 771 456",
+    "email": "fadi@westsidetelecom.example"
+  }
+]
