@@ -34,16 +34,16 @@ Use this file as the source for GitHub issues. Create one issue for each uncheck
 | ~~P1~~ | ~~Add optional AI explanation to daily owner reports~~ | `enhancement`, `automation`, `ai` | Complete: deterministic facts remain the safe default; an optional live AI writer can explain them without changing stock. |
 | P1 | Send verified stock replies through WhatsApp | `enhancement`, `whatsapp`, `automation` | For clear matched requests only, send a template-style reply based on current stock. Out-of-stock and unclear requests receive safe availability or staff-review messages. Replies stay disabled until Meta credentials are configured. |
 | P1 | Manage WhatsApp connection settings in Admin | `enhancement`, `whatsapp`, `settings`, `frontend`, `backend` | Admin can edit the customer-facing WhatsApp introduction and business number in the website. Keep Meta secrets out of the browser; add connection testing and phone-number ID mapping. |
-| P2 | Add CSV product and stock import | `enhancement`, `import` | In progress: admins can upload a CSV, preview valid rows and errors, then confirm a catalog update. Next: save an auditable import-history record. |
+| ~~P2~~ | ~~Add CSV product and stock import~~ | `enhancement`, `import` | Complete: admins can preview, confirm, and review history for catalog CSV imports. |
 | P2 | Add GitHub Actions checks | `good first issue`, `ci` | Pull requests run backend tests and the frontend build. |
-| P1 | Build a complete guided demo journey | `enhancement`, `portfolio`, `frontend` | Walk from a fictional incoming message through AI review, draft, approval, dispatch, and stock history. |
-| P1 | Add import history | `enhancement`, `import`, `backend` | Record the admin, time, source filename, and created/updated row counts for every confirmed CSV import. |
-| P1 | Add ready-to-order restock queue | `enhancement`, `inventory`, `frontend` | Accepted restock suggestions appear separately for supplier follow-up, without placing purchases automatically. |
-| P1 | Add sales analytics | `enhancement`, `analytics`, `backend`, `frontend` | Show best sellers, slow movers, no-sale products, and category revenue for 7- and 30-day periods. |
+| ~~P1~~ | ~~Build a complete guided demo journey~~ | `enhancement`, `portfolio`, `frontend` | Complete: README and screenshots show the message-to-dispatch journey. |
+| ~~P1~~ | ~~Add import history~~ | `enhancement`, `import`, `backend` | Complete: confirmed imports record the admin, file, time, and row counts. |
+| ~~P1~~ | ~~Add ready-to-order restock queue~~ | `enhancement`, `inventory`, `frontend` | Complete: accepted suggestions appear in a manual supplier follow-up queue. |
+| ~~P1~~ | ~~Add sales analytics~~ | `enhancement`, `analytics`, `backend`, `frontend` | Complete: Operations shows seven-day best sellers, slow movers, and no-sale products. |
 | ~~P1~~ | ~~Add supplier records~~ | `enhancement`, `inventory`, `backend`, `frontend` | Complete: admins can add and view fictional supplier contacts, supplied SKUs, and expected lead time through the Suppliers screen. |
-| P1 | Add barcode and IMEI product entry | `enhancement`, `inventory`, `frontend`, `backend` | Admins can scan or type a barcode and optionally record one IMEI for a single tracked phone unit. Barcode and IMEI values must remain unique. |
-| P1 | Add in-app operational alerts | `enhancement`, `frontend`, `backend` | Surface low stock, out-of-stock products, pending orders, and failed import outcomes. |
-| P2 | Add portfolio screenshots and demo video | `documentation`, `portfolio` | README contains current screenshots and a short walkthrough from customer message through review, draft, approval, and dispatch. |
+| ~~P1~~ | ~~Add barcode and IMEI product entry~~ | `enhancement`, `inventory`, `frontend`, `backend` | Complete: Admin product entry supports unique barcode generation and optional single-phone IMEI. |
+| ~~P1~~ | ~~Add in-app operational alerts~~ | `enhancement`, `frontend`, `backend` | Complete: Operations shows stock and pending-order alerts. |
+| ~~P2~~ | ~~Add portfolio screenshots and demo video~~ | `documentation`, `portfolio` | Complete: README contains six screenshots; demo video is optional. |
 
 ## Latest verification
 
