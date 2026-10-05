@@ -51,7 +51,7 @@ export async function login(email:string,password:string): Promise<AuthSession> 
 }
 export async function getSetupStatus():Promise<{needs_owner_setup:boolean}>{return requireOk(await fetch('/api/auth/setup-status'),'Could not check account setup.').then(response=>response.json());}
 export async function setupOwner(name:string,email:string,password:string):Promise<AuthSession>{return requireOk(await fetch('/api/auth/setup-owner',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password})}),'Owner account could not be created.').then(response=>response.json());}
-export async function saveProduct(product:Omit<Product,'id'>, id?:number): Promise<Product> {
+export async function saveProduct(product:Omit<Product,'id'|'imei'> & {imei?:string|null}, id?:number): Promise<Product> {
  return requireOk(await apiFetch(id?`/api/products/${id}`:'/api/products',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(product)}),'Product could not be saved.').then(response=>response.json());
 }
 export async function getPhoneUnits(signal:AbortSignal):Promise<PhoneUnit[]>{return requireOk(await apiFetch('/api/phone-units',{signal}),'Phone units could not be loaded.').then(response=>response.json());}
