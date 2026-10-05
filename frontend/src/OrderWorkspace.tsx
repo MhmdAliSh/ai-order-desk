@@ -18,7 +18,7 @@ export function OrderWorkspace({ products, onOrderSaved, initialLines=[] }: { pr
  const [scannerOpen,setScannerOpen]=useState(false);
  useEffect(() => {
   const controller = new AbortController();
-  getCustomers(controller.signal).then(setCustomers).catch((reason: Error) => setError(reason.message)).finally(() => setLoadingCustomers(false));
+  getCustomers(controller.signal).then(setCustomers).catch((reason: Error) => { if(reason.name!=='AbortError'&&!controller.signal.aborted)setError(reason.message); }).finally(() => { if(!controller.signal.aborted)setLoadingCustomers(false); });
   return () => controller.abort();
  }, []);
  useEffect(()=>{if(initialLines.length)setLines(initialLines.map(line=>{const product=products.find(item=>item.id===line.product_id);return product?{product,quantity:Math.min(product.stock,line.quantity)}:null}).filter((line):line is Line=>line!==null));},[initialLines,products]);
@@ -49,4 +49,5 @@ export function OrderWorkspace({ products, onOrderSaved, initialLines=[] }: { pr
   <aside className="order-summary panel"><div className="eyebrow">DRAFT SUMMARY</div><h2>Ready when you are.</h2><div className="summary-items"><span>{lines.length} product{lines.length === 1 ? '' : 's'}</span><strong>{money(total)}</strong></div><div className="summary-rule"/><p>Prices are taken from the product catalog. Stock is checked when you save the draft.</p>{error && <div role="alert" className="order-message error"><TriangleAlert size={17}/>{error}</div>}{success && <div role="status" className="order-message success"><CheckCircle2 size={17}/>{success}</div>}{savedOrder?.status==='draft'&&<button className="button secondary full" disabled={saving} onClick={()=>progress('approve')}>Confirm order</button>}{savedOrder?.status==='approved'&&<button className="button primary full" disabled={saving} onClick={()=>progress('dispatch')}><Send size={15}/>Confirm dispatch</button>}{savedOrder?.status==='dispatched'&&<p className="summary-note">Order dispatched and stock updated.</p>}<button className="button primary full" disabled={saving || loadingCustomers} onClick={save}>{saving ? 'Saving draft…' : 'Save draft'}</button><small className="summary-note">A draft does not reserve or deduct stock.</small></aside>
  </section>;
 }
+
 

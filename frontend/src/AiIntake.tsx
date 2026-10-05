@@ -13,7 +13,7 @@ export function AiIntake({ products, onSaved }: { products: Product[]; onSaved: 
 
   useEffect(() => {
     const controller = new AbortController();
-    getCustomers(controller.signal).then(setCustomers).catch((reason: Error) => setError(reason.message));
+    getCustomers(controller.signal).then(setCustomers).catch((reason: Error) => { if(reason.name!=='AbortError'&&!controller.signal.aborted)setError(reason.message); });
     const inboxMessage=sessionStorage.getItem('orderdesk-inbox-message');
     if(inboxMessage){setMessage(inboxMessage);sessionStorage.removeItem('orderdesk-inbox-message');}
     return () => controller.abort();
@@ -95,3 +95,4 @@ export function AiIntake({ products, onSaved }: { products: Product[]; onSaved: 
     </section>}
   </section>;
 }
+
