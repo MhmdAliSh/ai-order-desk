@@ -149,6 +149,10 @@ cd ..\frontend
 npm run build
 ```
 
+## Contributing
+
+Read [AGENTS.md](AGENTS.md) before changing code. It covers coding standards, design principles, tests, and how issues are labelled.
+
 ## Scope and safety
 
 All sample data is fictional. The app uses AI only to interpret customer messages and propose product matches. Stock, money, approval, dispatch, and cancellation stay in deterministic backend code and require a human action.

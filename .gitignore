@@ -51,5 +51,3 @@ test-results/
 # Local Codex conversation export
 codex-session-*.md
 
-# Local assistant and planning notes
-AGENTS.md
