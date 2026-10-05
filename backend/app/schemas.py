@@ -244,6 +244,9 @@ class ProductImportRow(BaseModel):
     category: str
     price: Decimal
     stock: int
+    barcode: str | None = None
+    imei: str | None = None
+    phone_unit_action: str | None = None
     action: str
 
 

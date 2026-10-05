@@ -37,7 +37,7 @@ Small retailers often manage product requests, stock, and customer conversations
 4. Confirm the order to reserve stock, then confirm dispatch to deduct it.
 5. Open **Stock history** to see the logged stock deduction.
 6. Open **Operations** to review alerts, sales signals, and owner-approved restock items.
-7. Open **CSV import** and preview `sample-data/product-import-template.csv` before confirming an update.
+7. Open **CSV import** and preview `sample-data/product-import-template.csv` before confirming an update. The importer accepts common headers such as `SKU`, `Product Name`, `Category`, `Price`, `Stock Quantity`, and optional `Barcode`/`GTIN`/`UPC`/`EAN`. Each in-stock phone is one row with `Stock Quantity` set to `1` and its own `IMEI`.
 
 
 ## Architecture

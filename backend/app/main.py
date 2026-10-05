@@ -147,23 +147,104 @@ def create_app(
         return product
 
     def parse_product_import(contents: str, session: Session) -> tuple[list[dict], list[str]]:
+        """Read a portable inventory CSV while accepting common export header names."""
         reader = csv.DictReader(StringIO(contents))
-        expected = {"sku", "name", "category", "price", "stock"}
-        if reader.fieldnames is None or {name.strip().lower() for name in reader.fieldnames} != expected:
-            return [], ["CSV must use exactly these headers: sku, name, category, price, stock."]
-        rows, errors = [], []
+        if reader.fieldnames is None:
+            return [], ["CSV needs a header row."]
+
+        def normalized_header(value: str) -> str:
+            return " ".join(value.replace("_", " ").replace("-", " ").strip().lower().split())
+
+        aliases = {
+            "sku": {"sku", "product sku", "variant sku", "item sku"},
+            "name": {"product name", "name", "title", "product title", "item name"},
+            "category": {"category", "product category", "product type", "type"},
+            "price": {"price", "retail price", "selling price", "unit price"},
+            "stock": {"stock quantity", "stock", "quantity", "inventory quantity", "on hand"},
+            "barcode": {"barcode", "gtin", "upc", "ean", "isbn"},
+            "imei": {"imei", "imei number", "phone imei"},
+            "colour": {"colour", "color"},
+            "storage": {"storage", "capacity"},
+            "supplier_name": {"supplier", "supplier name", "vendor"},
+            "purchase_cost": {"purchase cost", "cost", "unit cost"},
+            "warranty_status": {"warranty", "warranty status"},
+        }
+        columns: dict[str, str] = {}
+        for header in reader.fieldnames:
+            key = normalized_header(header)
+            for field, names in aliases.items():
+                if key in names and field not in columns:
+                    columns[field] = header
+                    break
+        required = {"sku", "name", "category", "price", "stock"}
+        missing = required - columns.keys()
+        if missing:
+            labels = {"sku": "SKU", "name": "Product Name", "category": "Category", "price": "Price", "stock": "Stock Quantity"}
+            return [], ["CSV is missing required columns: " + ", ".join(labels[field] for field in sorted(missing)) + "."]
+
+        rows: list[dict] = []
+        errors: list[str] = []
+        seen_skus: set[str] = set()
+        seen_imeis: set[str] = set()
+        seen_barcodes: dict[str, str] = {}
         for index, raw in enumerate(reader, start=2):
             try:
-                sku = (raw.get("sku") or "").strip().upper()
-                name = (raw.get("name") or "").strip()
-                category = (raw.get("category") or "").strip()
-                price = Decimal((raw.get("price") or "").strip())
-                stock = int((raw.get("stock") or "").strip())
+                def value(field: str) -> str:
+                    return (raw.get(columns[field]) or "").strip() if field in columns else ""
+
+                sku = value("sku").upper()
+                name, category = value("name"), value("category")
+                price = Decimal(value("price"))
+                stock = int(value("stock"))
+                barcode = value("barcode") or None
+                imei = value("imei") or None
+                is_phone = category.lower() == "phones"
                 if not sku or not name or not category or price < 0 or stock < 0:
                     raise ValueError
-                rows.append({"row": index, "sku": sku, "name": name, "category": category, "price": price, "stock": stock, "action": "update" if session.scalar(select(Product.id).where(Product.sku == sku)) else "create"})
+                if sku in seen_skus and not imei:
+                    errors.append(f"Row {index}: SKU {sku} appears more than once. Repeat a SKU only for separate phone IMEI rows.")
+                    continue
+                if imei:
+                    if not is_phone:
+                        errors.append(f"Row {index}: IMEI can only be used when Category is Phones.")
+                        continue
+                    if stock != 1:
+                        errors.append(f"Row {index}: a phone row with an IMEI must have Stock Quantity set to 1.")
+                        continue
+                    if len(imei) < 14 or len(imei) > 32 or not all(character.isalnum() or character == "-" for character in imei):
+                        errors.append(f"Row {index}: IMEI must contain 14-32 letters, numbers, or hyphens.")
+                        continue
+                    if imei in seen_imeis:
+                        errors.append(f"Row {index}: IMEI {imei} appears more than once in this file.")
+                        continue
+                    seen_imeis.add(imei)
+                elif is_phone and stock > 0:
+                    errors.append(f"Row {index}: every in-stock phone needs its own IMEI row. Use Stock Quantity 1 for each phone.")
+                    continue
+                if barcode:
+                    if barcode in seen_barcodes and seen_barcodes[barcode] != sku:
+                        errors.append(f"Row {index}: barcode {barcode} appears under more than one SKU in this file.")
+                        continue
+                    existing_barcode = session.scalar(select(Product).where(Product.barcode == barcode))
+                    if existing_barcode is not None and existing_barcode.sku != sku:
+                        errors.append(f"Row {index}: barcode {barcode} already belongs to SKU {existing_barcode.sku}.")
+                        continue
+                    seen_barcodes[barcode] = sku
+                seen_skus.add(sku)
+                existing_product = session.scalar(select(Product).where(Product.sku == sku))
+                existing_unit = session.scalar(select(PhoneUnit).where(PhoneUnit.imei == imei)) if imei else None
+                rows.append({
+                    "row": index, "sku": sku, "name": name, "category": category, "price": price,
+                    "stock": stock, "barcode": barcode, "imei": imei,
+                    "colour": value("colour") or "Not supplied", "storage": value("storage") or "Not supplied",
+                    "supplier_name": value("supplier_name") or None,
+                    "purchase_cost": Decimal(value("purchase_cost")) if value("purchase_cost") else Decimal("0"),
+                    "warranty_status": value("warranty_status") or "Standard warranty",
+                    "phone_unit_action": ("update" if existing_unit else "add") if imei else None,
+                    "action": "update" if existing_product else "create",
+                })
             except (ValueError, ArithmeticError):
-                errors.append(f"Row {index}: SKU, name, category, a non-negative price, and a non-negative whole-number stock are required.")
+                errors.append(f"Row {index}: SKU, Product Name, Category, non-negative Price, and whole-number Stock Quantity are required.")
         return rows, errors
 
     def find_customer(customer_id: int, session: Session) -> Customer:
@@ -343,12 +424,32 @@ def create_app(
         rows, errors = parse_product_import(contents, session)
         if errors:
             raise HTTPException(status_code=422, detail={"message": "Fix CSV errors before importing.", "errors": errors})
+        created_skus: set[str] = set()
         for row in rows:
-            product = session.scalar(select(Product).where(Product.sku == row["sku"])) or Product(sku=row["sku"], name=row["name"], category=row["category"], price_cents=0, stock=0)
+            product = session.scalar(select(Product).where(Product.sku == row["sku"]))
+            if product is None:
+                product = Product(sku=row["sku"], name=row["name"], category=row["category"], price_cents=0, stock=0)
+                created_skus.add(row["sku"])
             product.name, product.category = row["name"], row["category"]
-            product.price_cents, product.stock = int(row["price"] * 100), row["stock"]
+            product.price_cents = int(row["price"] * 100)
+            if row["barcode"]:
+                product.barcode = row["barcode"]
+            if row["imei"]:
+                # Each IMEI row represents one physical phone, so stock is increased only for a new unit.
+                unit = session.scalar(select(PhoneUnit).where(PhoneUnit.imei == row["imei"]))
+                if unit is None:
+                    unit = PhoneUnit(product=product, imei=row["imei"], colour=row["colour"], storage=row["storage"], supplier_name=row["supplier_name"], purchase_cost_cents=int(row["purchase_cost"] * 100), warranty_status=row["warranty_status"])
+                    product.stock += 1
+                    session.add(unit)
+                elif unit.status != "dispatched":
+                    unit.product = product
+                    unit.colour, unit.storage = row["colour"], row["storage"]
+                    unit.supplier_name, unit.purchase_cost_cents = row["supplier_name"], int(row["purchase_cost"] * 100)
+                    unit.warranty_status = row["warranty_status"]
+            else:
+                product.stock = row["stock"]
             session.add(product)
-        created_rows = sum(row["action"] == "create" for row in rows)
+        created_rows = len(created_skus)
         session.add(ImportRecord(filename=file.filename, imported_by=_ ["email"], created_rows=created_rows, updated_rows=len(rows)-created_rows))
         session.commit()
         return {"valid_rows": len(rows), "errors": [], "rows": rows}

@@ -1,3 +1,5 @@
-sku,name,category,price,stock
-DEMO-CHARGER-01,Demo USB-C Charger,Chargers,19.99,24
-DEMO-CASE-01,Demo Clear Case,Cases,14.50,8
+SKU,Product Name,Category,Price,Stock Quantity,Barcode,IMEI,Colour,Storage,Supplier,Purchase Cost,Warranty Status
+ACC-CHG-20W-WHT,USB-C Wall Charger 20W - White,Chargers,19.99,24,8501234567890,,,,,,
+ACC-CASE-IP15-BLK,Case for iPhone 15 - Silicone Black,Cases,14.50,8,8501234567906,,,,,,
+PHONE-IP16-128-BLK,iPhone 16 128GB - Black,Phones,899.00,1,194253000001,356938035643809,Black,128GB,Demo Mobile Supply,720.00,12 months
+PHONE-IP16-128-BLK,iPhone 16 128GB - Black,Phones,899.00,1,194253000001,356938035643817,Black,128GB,Demo Mobile Supply,720.00,12 months

@@ -71,7 +71,7 @@ def test_role_login_and_admin_only_catalog_and_customer_management(monkeypatch, 
         assert dismissed.status_code == 200
         assert dismissed.json()["id"] == accepted.json()["id"]
         assert dismissed.json()["decision"] == "dismissed"
-        csv_text = "sku,name,category,price,stock\nIMPORT-001,Imported cable,Cables,8.50,6\n"
+        csv_text = "SKU,Product Name,Category,Price,Stock Quantity,Barcode,IMEI\nIMPORT-001,Imported cable,Cables,8.50,6,8501234567890,\n"
         preview = client.post("/imports/products/preview", files={"file": ("products.csv", csv_text, "text/csv")})
         assert preview.status_code == 200
         assert preview.json()["rows"][0]["action"] == "create"
