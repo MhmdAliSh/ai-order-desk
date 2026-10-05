@@ -450,6 +450,7 @@ def create_app(
                 Product.sku.icontains(term, autoescape=True),
                 Product.name.icontains(term, autoescape=True),
                 Product.category.icontains(term, autoescape=True),
+                Product.barcode.icontains(term, autoescape=True),
             ))
         return session.scalars(statement.offset(offset).limit(limit)).all()
 

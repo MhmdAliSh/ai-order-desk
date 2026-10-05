@@ -66,9 +66,10 @@ def test_replace_and_conflicting_update(client, product):
 
 
 def test_search_and_pagination(client, product):
-    client.post("/products", json=product)
+    client.post("/products", json=dict(product, barcode="1234567890123"))
     client.post("/products", json=dict(product, sku="CBL-01", name="USB cable", category="Cables"))
     assert len(client.get("/products", params={"q": "charger"}).json()) == 1
+    assert len(client.get("/products", params={"q": "1234567890123"}).json()) == 1
     assert client.get("/products", params={"q": "%"}).json() == []
     assert client.get("/products", params={"offset": 1, "limit": 1}).json()[0]["sku"] == "CBL-01"
     assert client.get("/products", params={"limit": 101}).status_code == 422
