@@ -86,6 +86,7 @@ class OrderLineInput(BaseModel):
 
     product_id: Annotated[int, Field(strict=True, ge=1)]
     quantity: Annotated[int, Field(strict=True, ge=1, le=2_147_483_647)]
+    phone_unit_id: Annotated[int | None, Field(strict=True, ge=1)] = None
 
 
 class OrderDraftInput(BaseModel):
@@ -100,11 +101,30 @@ class OrderItemResponse(BaseModel):
 
     id: int
     product_id: int
+    phone_unit_id: int | None = None
     sku: str
     product_name: str
     unit_price: Decimal
     quantity: int
     line_total: Decimal
+
+
+class PhoneUnitInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+    product_id: Annotated[int, Field(strict=True, ge=1)]
+    imei: str = Field(min_length=14, max_length=32, pattern=r"^[0-9A-Za-z-]+$")
+    colour: str = Field(min_length=1, max_length=80)
+    storage: str = Field(min_length=1, max_length=40)
+    supplier_name: str | None = Field(default=None, max_length=120)
+    purchase_cost: Decimal = Field(ge=0, max_digits=10, decimal_places=2)
+    warranty_status: str = Field(default="Standard warranty", min_length=1, max_length=80)
+
+
+class PhoneUnitResponse(PhoneUnitInput):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    status: str
+    created_at: datetime
 
 
 class OrderResponse(BaseModel):

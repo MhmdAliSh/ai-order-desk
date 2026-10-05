@@ -16,7 +16,7 @@ from sqlalchemy import create_engine, func, inspect, or_, select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload, sessionmaker
 
-from .models import Base, Customer, DailyReport, ImportRecord, IntegrationSettings, Order, OrderItem, Product, RestockDecision, RestockRule, StockMovement, Supplier, UserAccount, WhatsAppInboundMessage
+from .models import Base, Customer, DailyReport, ImportRecord, IntegrationSettings, Order, OrderItem, PhoneUnit, Product, RestockDecision, RestockRule, StockMovement, Supplier, UserAccount, WhatsAppInboundMessage
 from .intake import RequestedItem, analyze_message
 from .intake_provider import IntakeProviderError, extract_requested_items as extract_live_requested_items
 from .auth import hash_password, issue_account_token, issue_token, verify_password, verify_token
@@ -34,6 +34,8 @@ from .schemas import (
     OrderResponse,
     ProductInput,
     ProductResponse,
+    PhoneUnitInput,
+    PhoneUnitResponse,
     DailyOperationsResponse,
     SavedDailyReport,
     RestockRuleInput,
@@ -74,9 +76,11 @@ def create_app(
     async def lifespan(app: FastAPI):
         Base.metadata.create_all(engine)
         columns = {column["name"] for column in inspect(engine).get_columns("products")}
+        order_item_columns = {column["name"] for column in inspect(engine).get_columns("order_items")}
         with engine.begin() as connection:
             if "barcode" not in columns: connection.execute(text("ALTER TABLE products ADD COLUMN barcode VARCHAR(128)"))
             if "imei" not in columns: connection.execute(text("ALTER TABLE products ADD COLUMN imei VARCHAR(32)"))
+            if "phone_unit_id" not in order_item_columns: connection.execute(text("ALTER TABLE order_items ADD COLUMN phone_unit_id INTEGER"))
         yield
         engine.dispose()
 
@@ -118,6 +122,12 @@ def create_app(
         if product is None:
             raise HTTPException(status_code=404, detail="Product not found")
         return product
+
+    def find_phone_unit(phone_unit_id: int, session: Session) -> PhoneUnit:
+        unit = session.get(PhoneUnit, phone_unit_id)
+        if unit is None:
+            raise HTTPException(status_code=404, detail="Phone unit not found")
+        return unit
 
     def save_product(product: Product, body: ProductInput, session: Session) -> Product:
         product.sku = body.sku
@@ -179,6 +189,7 @@ def create_app(
                 {
                     "id": item.id,
                     "product_id": item.product_id,
+                    "phone_unit_id": item.phone_unit_id,
                     "sku": item.sku,
                     "product_name": item.product_name,
                     "unit_price": f"{item.unit_price_cents / 100:.2f}",
@@ -450,6 +461,51 @@ def create_app(
     def replace_product(product_id: int, body: ProductInput, session: SessionDep, _: AdminDep):
         return save_product(find_product(product_id, session), body, session)
 
+    @app.get("/phone-units", response_model=list[PhoneUnitResponse], tags=["Phone units"])
+    def list_phone_units(session: SessionDep, _: UserDep, product_id: int | None = Query(None, ge=1)):
+        statement = select(PhoneUnit).order_by(PhoneUnit.created_at.desc())
+        if product_id:
+            statement = statement.where(PhoneUnit.product_id == product_id)
+        return session.scalars(statement).all()
+
+    @app.post("/phone-units", response_model=PhoneUnitResponse, status_code=201, tags=["Phone units"])
+    def create_phone_unit(body: PhoneUnitInput, session: SessionDep, _: AdminDep):
+        product = find_product(body.product_id, session)
+        if product.category.lower() != "phones":
+            raise HTTPException(status_code=422, detail="Phone units can only be added to products in the Phones category")
+        unit = PhoneUnit(product_id=product.id, imei=body.imei, colour=body.colour, storage=body.storage, supplier_name=body.supplier_name or None, purchase_cost_cents=int(body.purchase_cost * 100), warranty_status=body.warranty_status)
+        session.add(unit)
+        product.stock += 1
+        try:
+            session.commit()
+        except IntegrityError:
+            session.rollback()
+            raise HTTPException(status_code=409, detail="A phone unit with this IMEI already exists") from None
+        session.refresh(unit)
+        return unit
+
+    @app.put("/phone-units/{phone_unit_id}", response_model=PhoneUnitResponse, tags=["Phone units"])
+    def update_phone_unit(phone_unit_id: int, body: PhoneUnitInput, session: SessionDep, _: AdminDep):
+        unit = find_phone_unit(phone_unit_id, session)
+        if unit.status == "dispatched":
+            raise HTTPException(status_code=409, detail="Dispatched phone units are historical records and cannot be edited")
+        product = find_product(body.product_id, session)
+        if product.category.lower() != "phones":
+            raise HTTPException(status_code=422, detail="Phone units can only belong to products in the Phones category")
+        if unit.product_id != product.id:
+            previous_product = find_product(unit.product_id, session)
+            previous_product.stock -= 1
+            product.stock += 1
+        unit.product_id, unit.imei, unit.colour, unit.storage = product.id, body.imei, body.colour, body.storage
+        unit.supplier_name, unit.purchase_cost_cents, unit.warranty_status = body.supplier_name or None, int(body.purchase_cost * 100), body.warranty_status
+        try:
+            session.commit()
+        except IntegrityError:
+            session.rollback()
+            raise HTTPException(status_code=409, detail="A phone unit with this IMEI already exists") from None
+        session.refresh(unit)
+        return unit
+
     @app.post("/customers", response_model=CustomerResponse, status_code=201, tags=["Customers"])
     def create_customer(body: CustomerInput, session: SessionDep, _: AdminDep):
         customer = Customer(**body.model_dump())
@@ -511,11 +567,23 @@ def create_app(
                 status_code=422,
                 detail={"message": "One or more quantities exceed stock on hand", "product_ids": unavailable},
             )
+        phone_unit_ids = [item.phone_unit_id for item in body.items if item.phone_unit_id is not None]
+        if len(phone_unit_ids) != len(set(phone_unit_ids)):
+            raise HTTPException(status_code=422, detail="Each phone unit may appear only once in an order")
+        for item in body.items:
+            if products[item.product_id].category.lower() == "phones" and item.phone_unit_id is None:
+                raise HTTPException(status_code=422, detail="Select an individual phone unit for phone orders")
+            if item.phone_unit_id is None:
+                continue
+            unit = find_phone_unit(item.phone_unit_id, session)
+            if item.quantity != 1 or unit.product_id != item.product_id or unit.status != "available":
+                raise HTTPException(status_code=422, detail="The selected phone unit is not available for this order")
         total_cents = sum(products[item.product_id].price_cents * item.quantity for item in body.items)
         order = Order(customer_id=customer.id, status="draft", total_cents=total_cents)
         order.items = [
             OrderItem(
                 product_id=products[item.product_id].id,
+                phone_unit_id=item.phone_unit_id,
                 sku=products[item.product_id].sku,
                 product_name=products[item.product_id].name,
                 unit_price_cents=products[item.product_id].price_cents,
@@ -546,11 +614,18 @@ def create_app(
             product = find_product(item.product_id, session)
             if item.quantity > product.stock - reserved_quantity(product.id, session, excluding_order_id=order.id):
                 unavailable.append(product.id)
+            if item.phone_unit_id is not None:
+                unit = find_phone_unit(item.phone_unit_id, session)
+                if unit.product_id != product.id or unit.status != "available":
+                    unavailable.append(product.id)
         if unavailable:
             raise HTTPException(
                 status_code=422,
                 detail={"message": "One or more items are no longer available", "product_ids": unavailable},
             )
+        for item in order.items:
+            if item.phone_unit_id is not None:
+                find_phone_unit(item.phone_unit_id, session).status = "reserved"
         order.status = "approved"
         session.commit()
         return to_order_action(read_order(order.id, session), "Stock reserved for this order")
@@ -564,6 +639,11 @@ def create_app(
             product = find_product(item.product_id, session)
             if item.quantity > product.stock:
                 raise HTTPException(status_code=409, detail="Stock changed unexpectedly; dispatch needs review")
+            if item.phone_unit_id is not None:
+                unit = find_phone_unit(item.phone_unit_id, session)
+                if unit.status != "reserved":
+                    raise HTTPException(status_code=409, detail="Phone unit changed unexpectedly; dispatch needs review")
+                unit.status = "dispatched"
             product.stock -= item.quantity
             session.add(StockMovement(
                 product_id=product.id,
@@ -581,6 +661,12 @@ def create_app(
         if order.status not in {"draft", "approved"}:
             raise HTTPException(status_code=409, detail="Only draft or approved orders can be cancelled")
         was_approved = order.status == "approved"
+        if was_approved:
+            for item in order.items:
+                if item.phone_unit_id is not None:
+                    unit = find_phone_unit(item.phone_unit_id, session)
+                    if unit.status == "reserved":
+                        unit.status = "available"
         order.status = "cancelled"
         session.commit()
         message = "Reservation released" if was_approved else "Draft cancelled"

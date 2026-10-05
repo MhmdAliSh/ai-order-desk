@@ -37,6 +37,7 @@ class Product(Base):
     stock: Mapped[int] = mapped_column(Integer)
     barcode: Mapped[str | None] = mapped_column(String(128), unique=True, nullable=True)
     imei: Mapped[str | None] = mapped_column(String(32), unique=True, nullable=True)
+    phone_units: Mapped[list["PhoneUnit"]] = relationship(back_populates="product", cascade="all, delete-orphan")
 
     @property
     def price(self) -> Decimal:
@@ -76,11 +77,33 @@ class OrderItem(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"))
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
+    phone_unit_id: Mapped[int | None] = mapped_column(ForeignKey("phone_units.id"), nullable=True)
     sku: Mapped[str] = mapped_column(String(64))
     product_name: Mapped[str] = mapped_column(String(200))
     unit_price_cents: Mapped[int] = mapped_column(Integer)
     quantity: Mapped[int] = mapped_column(Integer)
     order: Mapped[Order] = relationship(back_populates="items")
+
+
+class PhoneUnit(Base):
+    __tablename__ = "phone_units"
+    __table_args__ = (CheckConstraint("status IN ('available', 'reserved', 'dispatched')", name="phone_unit_status"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
+    imei: Mapped[str] = mapped_column(String(32), unique=True)
+    colour: Mapped[str] = mapped_column(String(80))
+    storage: Mapped[str] = mapped_column(String(40))
+    supplier_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    purchase_cost_cents: Mapped[int] = mapped_column(Integer)
+    warranty_status: Mapped[str] = mapped_column(String(80), default="Standard warranty")
+    status: Mapped[str] = mapped_column(String(20), default="available")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    product: Mapped[Product] = relationship(back_populates="phone_units")
+
+    @property
+    def purchase_cost(self) -> Decimal:
+        return (Decimal(self.purchase_cost_cents) / 100).quantize(Decimal("0.01"))
 
 
 class StockMovement(Base):

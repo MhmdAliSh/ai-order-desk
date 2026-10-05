@@ -1,4 +1,5 @@
 export type Product = {id:number;sku:string;name:string;category:string;price:string;stock:number;barcode:string|null;imei:string|null};
+export type PhoneUnit={id:number;product_id:number;imei:string;colour:string;storage:string;supplier_name:string|null;purchase_cost:string;warranty_status:string;status:'available'|'reserved'|'dispatched';created_at:string};
 export type Customer = {id:number;name:string;contact_name:string;phone:string;email:string};
 export type OrderItem = {id:number;product_id:number;sku:string;product_name:string;unit_price:string;quantity:number;line_total:string};
 export type Order = {id:number;customer:Customer;status:'draft'|'approved'|'dispatched'|'cancelled';total:string;created_at:string;items:OrderItem[]};
@@ -34,7 +35,7 @@ export async function getCustomers(signal:AbortSignal): Promise<Customer[]> {
 export async function getOrders(signal:AbortSignal): Promise<Order[]> {
  return requireOk(await apiFetch('/api/orders',{signal}),'The order history could not be loaded.').then(response=>response.json());
 }
-export async function createOrder(customerId:number,items:{product_id:number;quantity:number}[]): Promise<Order> {
+export async function createOrder(customerId:number,items:{product_id:number;quantity:number;phone_unit_id?:number}[]): Promise<Order> {
  return requireOk(await apiFetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer_id:customerId,items})}),'The order draft could not be saved.').then(response=>response.json());
 }
 export async function changeOrderStatus(orderId:number, action:'approve'|'dispatch'|'cancel'): Promise<Order & {message:string}> {
@@ -53,6 +54,8 @@ export async function setupOwner(name:string,email:string,password:string):Promi
 export async function saveProduct(product:Omit<Product,'id'>, id?:number): Promise<Product> {
  return requireOk(await apiFetch(id?`/api/products/${id}`:'/api/products',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(product)}),'Product could not be saved.').then(response=>response.json());
 }
+export async function getPhoneUnits(signal:AbortSignal):Promise<PhoneUnit[]>{return requireOk(await apiFetch('/api/phone-units',{signal}),'Phone units could not be loaded.').then(response=>response.json());}
+export async function createPhoneUnit(unit:Omit<PhoneUnit,'id'|'status'|'created_at'>):Promise<PhoneUnit>{return requireOk(await apiFetch('/api/phone-units',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(unit)}),'Phone unit could not be saved.').then(response=>response.json());}
 export async function saveCustomer(customer:Omit<Customer,'id'>,id?:number):Promise<Customer> {
  return requireOk(await apiFetch(id?`/api/customers/${id}`:'/api/customers',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(customer)}),'Customer could not be saved.').then(response=>response.json());
 }
