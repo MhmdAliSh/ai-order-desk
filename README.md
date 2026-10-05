@@ -85,6 +85,7 @@ graph LR
 - **Backend:** Python, FastAPI, SQLAlchemy, Pydantic
 - **Frontend:** React, TypeScript, Vite
 - **Database:** SQLite
+- **Containers:** Docker, Docker Compose, nginx (serves the built frontend)
 - **Tests:** pytest
 
 ## Local setup
@@ -107,6 +108,35 @@ npm run dev
 ```
 
 Open `http://127.0.0.1:5173`, choose **Team workspace**, and create the first owner account. The backend API documentation is available at `http://127.0.0.1:8000/docs`.
+
+## Docker setup
+
+Prerequisites: Docker with the Compose plugin.
+
+The stack has two containers, each with its own Dockerfile:
+
+- `backend` (`backend/Dockerfile`): FastAPI on Python 3.14 Alpine. It creates tables on startup and keeps the SQLite database in the `backend-data` volume.
+- `frontend` (`frontend/Dockerfile`): builds the React app and serves it with nginx. Requests to `/api` are forwarded to the backend.
+
+```bash
+cp backend/.env.example backend/.env   # then replace the passwords and signing secret
+docker compose up -d --build
+```
+
+Open `http://localhost:8080` for the app and `http://localhost:8000/docs` for the API documentation.
+
+Optional port settings, read from your shell or a root `.env` file:
+
+- `FRONTEND_PORT` (default `8080`) and `BACKEND_PORT` (default `8000`): ports published on your machine.
+
+Useful commands:
+
+```bash
+docker compose exec backend python -m app.seed             # load the demo catalog
+docker compose exec backend python -m app.seed_customers   # load demo customers
+docker compose exec backend python -m app.daily_job        # save today's daily report
+docker compose down                                        # stop (add -v to delete the database volume)
+```
 
 
 ## Verification
